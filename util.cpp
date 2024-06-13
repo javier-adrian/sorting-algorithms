@@ -34,29 +34,10 @@ void switchMode(
      paused = true;
 }
 
-uint64_t timeSinceEpochMillisec() {
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-}
-
 void populateArray(int (&array)[SIZE]) {
     for (int i = 0; i < SIZE; i++) {
         array[i] = i + 1;
     }
-}
-
-void printArray(int (&array)[SIZE], int min, int max) {
-    for (int value: array) {
-        if (value == min)
-            std::cout << "\033[1;32m" << value << "\033[0m" << ", ";
-        else if (value == max)
-            std::cout << "\033[1;31m" << value << "\033[0m" << ", ";
-        else
-            std::cout << value << ", ";
-    }
-
-    std::cout << '\b' << '\b';
-    std::cout << std::endl;
 }
 
 void drawGraph(int (&array)[SIZE], int n, int lowest, int current, int verified, raylib::Window &window) {
