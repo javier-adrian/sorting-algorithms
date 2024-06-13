@@ -3,7 +3,11 @@
 
 int main() {
     int array[SIZE];
-    populateArray(array);
+
+    for (int i = 0; i < SIZE; i++) {
+        array[i] = i + 1;
+    }
+
     std::random_shuffle(std::begin(array) + 1, std::end(array));
 
     // ----------------------------------------------------------------------------------------------------------------

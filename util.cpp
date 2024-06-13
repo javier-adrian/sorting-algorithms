@@ -34,12 +34,6 @@ void switchMode(
      paused = true;
 }
 
-void populateArray(int (&array)[SIZE]) {
-    for (int i = 0; i < SIZE; i++) {
-        array[i] = i + 1;
-    }
-}
-
 void drawGraph(int (&array)[SIZE], int n, int lowest, int current, int verified, raylib::Window &window) {
     BeginDrawing();
 
