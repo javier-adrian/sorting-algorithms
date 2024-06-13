@@ -64,7 +64,7 @@ int* swap(int (&array)[SIZE], int value1, int value2) {
     return array;
 }
 
-int* selectionSort(int (&array)[SIZE], int n, int &lowest, raylib::Window &window) {
+int* selectionSort(int (&array)[SIZE], int n, int &lowest) {
     int tmp;
 
     int lowestValue = array[n];
@@ -113,13 +113,12 @@ int main() {
     int n = 0;
 
     int lowest = 0;
-    int current = 0;
     int verified = 0;
 
     while (!window.ShouldClose())
     {
         if (n < SIZE) {
-            selectionSort(array, n, lowest, window);
+            selectionSort(array, n, lowest);
             n++;
         }
         else {
