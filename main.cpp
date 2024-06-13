@@ -6,6 +6,34 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+enum MODE {
+    SELECTION,
+    BUBBLE,
+    INSERTION
+};
+
+void switchMode(
+    int (&array)[SIZE],
+    int &n,
+    int &current,
+    int &lowest,
+    int &verified,
+    MODE &mode,
+    bool &paused,
+    MODE newMode
+    ) {
+    std::random_shuffle(std::begin(array) + 1, std::end(array));
+
+    n = 0;
+    lowest = 0;
+    current = 0;
+    verified = 0;
+
+    mode = newMode;
+
+     paused = true;
+}
+
 uint64_t timeSinceEpochMillisec() {
     using namespace std::chrono;
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -131,13 +159,40 @@ int main() {
     int current = 0;
     int verified = 0;
 
+    MODE mode = SELECTION;
+
+    bool paused = false;
+
     while (!window.ShouldClose())
     {
+        if (IsKeyReleased(KEY_SPACE))
+            paused = !paused;
+        if (IsKeyReleased(KEY_ONE))
+            switchMode(array, n, current, lowest, verified, mode, paused, SELECTION);
+        if (IsKeyReleased(KEY_TWO))
+            switchMode(array, n, current, lowest, verified, mode, paused, BUBBLE);
+        if (IsKeyReleased(KEY_THREE))
+            switchMode(array, n, current, lowest, verified, mode, paused, INSERTION);
+
+
         if (n < SIZE) {
-            // selectionSort(array, n, lowest);
-            // bubbleSort(array, n);
-            insertionSort(array, n, current);
-            n++;
+            if (!paused) {
+                switch (mode) {
+                    case SELECTION:
+                        selectionSort(array, n, lowest);
+                        break;
+                    case BUBBLE:
+                        bubbleSort(array, n);
+                        break;
+                    case INSERTION:
+                        insertionSort(array, n, current);
+                        break;
+                    default:
+                        selectionSort(array, n, lowest);
+                        break;
+                }
+                n++;
+            }
         }
         else {
             lowest = 0;
