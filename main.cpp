@@ -11,28 +11,10 @@ uint64_t timeSinceEpochMillisec() {
     return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
-void drawGraph(int (&array)[SIZE], int n, int lowest, int verified, raylib::Window &window) {
-    BeginDrawing();
-
-    window.ClearBackground(BLACK);
-
+void populateArray(int (&array)[SIZE]) {
     for (int i = 0; i < SIZE; i++) {
-        Color color = RAYWHITE;
-
-        if (i == lowest) color = RED;
-        if (i == n || i < verified) color = GREEN;
-
-        int barHeight = (HEIGHT) * array[i] / SIZE;
-        int barWidth = WIDTH / SIZE;
-
-        int barPosX = (barWidth) * i + (WIDTH - barWidth * SIZE) / 2; // last two terms center the graph
-        int barPosY = HEIGHT - barHeight;
-
-        DrawRectangle(barPosX, barPosY, barWidth - 1, barHeight, color);
-        window.DrawFPS();
+        array[i] = i + 1;
     }
-
-    EndDrawing();
 }
 
 void printArray(int (&array)[SIZE], int min, int max) {
@@ -49,32 +31,51 @@ void printArray(int (&array)[SIZE], int min, int max) {
     std::cout << std::endl;
 }
 
+void drawGraph(int (&array)[SIZE], int n, int lowest, int current, int verified, raylib::Window &window) {
+    BeginDrawing();
+
+    window.ClearBackground(BLACK);
+
+    for (int i = 0; i < SIZE; i++) {
+        Color color = RAYWHITE;
+
+        if (i == lowest || i == current) color = RED;
+        if (i == n || i < verified) color = GREEN;
+
+        int barHeight = (HEIGHT) * array[i] / SIZE;
+        int barWidth = WIDTH / SIZE;
+
+        int barPosX = (barWidth) * i + (WIDTH - barWidth * SIZE) / 2; // last two terms center the graph
+        int barPosY = HEIGHT - barHeight;
+
+        DrawRectangle(barPosX, barPosY, barWidth - 1, barHeight, color);
+        window.DrawFPS();
+    }
+
+    EndDrawing();
+}
+
 int* swap(int (&array)[SIZE], int value1, int value2) {
     int tmp;
     int lowest = array[value2];
 
     tmp = array[value1];
-    // printArray(array, lowest, tmp);
     array[value1] = lowest;
     array[value2] = tmp;
-    // printArray(array, lowest, tmp);
-
-    // std::cout << std::endl;
 
     return array;
 }
 
 int* selectionSort(int (&array)[SIZE], int n, int &lowest) {
-    int tmp;
-
     int lowestValue = array[n];
     int lowest_i = n;
+    lowest = n;
 
-    for (int j = n+1; j < SIZE; j++) {
-        if (array[j] < lowestValue) {
-            lowest = j;
-            lowestValue = array[j];
-            lowest_i = j;
+    for (int i = n+1; i < SIZE; i++) {
+        if (array[i] < lowestValue) {
+            lowest = i;
+            lowestValue = array[i];
+            lowest_i = i;
         }
     }
 
@@ -83,21 +84,35 @@ int* selectionSort(int (&array)[SIZE], int n, int &lowest) {
     return array;
 }
 
+int* bubbleSort(int (&array)[SIZE], int n) {
+    for (int i = 0; i < SIZE - n - 1; i++) {
+        if (array[i] > array[i+1]) {
+            swap(array, i, i+1);
+        }
+    }
+    return array;
+}
+
+int* insertionSort(int (&array)[SIZE], int n, int &current) {
+    for (int i = n; i > 0; i--) {
+        if (array[i] < array[i - 1]) {
+            current = i;
+            swap(array, i, i-1);
+        } else
+            return array;
+    }
+    return array;
+}
+
 void verify(int (&array)[SIZE], int &verified) {
     if (array[verified] == verified + 1)
         verified++;
 }
 
-void populateArray(int (&array)[SIZE]) {
-    for (int i = 0; i < SIZE; i++) {
-        array[i] = i + 1;
-    }
-}
-
 int main() {
     int array[SIZE];
     populateArray(array);
-    std::random_shuffle(std::begin(array), std::end(array));
+    std::random_shuffle(std::begin(array) + 1, std::end(array));
 
     // ----------------------------------------------------------------------------------------------------------------
 
@@ -113,26 +128,26 @@ int main() {
     int n = 0;
 
     int lowest = 0;
+    int current = 0;
     int verified = 0;
 
     while (!window.ShouldClose())
     {
         if (n < SIZE) {
-            selectionSort(array, n, lowest);
+            // selectionSort(array, n, lowest);
+            // bubbleSort(array, n);
+            insertionSort(array, n, current);
             n++;
         }
         else {
-            lowest = SIZE;
+            lowest = 0;
+            current = 0;
             verify(array, verified);
         };
-        drawGraph(array, n, lowest, verified, window);
+        drawGraph(array, n, lowest, current, verified, window);
     }
 
     CloseWindow();
-
-    // uint64_t time = timeSinceEpochMillisec();
-    // selectionSort(array);
-    // uint64_t duration = timeSinceEpochMillisec() - time;
 
     return 0;
 }
